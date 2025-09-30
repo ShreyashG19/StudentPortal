@@ -29,3 +29,16 @@ export const signupValidationSchema = joi.object({
             "string.empty": "Role is required",
         }),
 });
+
+export const loginValidationSchema = joi.object({
+    email: Joi.string().email().lowercase().trim().required().messages({
+        "string.empty": "Email is required",
+        "string.email": "Email must be valid",
+    }),
+
+    password: Joi.string().min(6).max(128).required().messages({
+        "string.empty": "Password is required",
+        "string.min": "Password must be at least 6 characters",
+        "string.max": "Password cannot exceed 128 characters",
+    }),
+});

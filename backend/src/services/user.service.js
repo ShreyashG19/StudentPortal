@@ -1,11 +1,9 @@
 import pool from "../config/db.js";
-import { hashPassword } from "../utils/hash.js";
 
 export const createUser = async (user) => {
     const { name, email, password, role } = user;
-    const hashedPassword = await hashPassword(password);
     const sql = `INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role`;
-    const values = [name, email, hashedPassword, role];
+    const values = [name, email, password, role];
     const result = await pool.query(sql, values);
     return result.rows[0];
 };
@@ -30,6 +28,20 @@ export const createTeacher = async (user) => {
 export const getUserByEmail = async (email) => {
     const sql = `SELECT * FROM users WHERE email = $1`;
     const values = [email];
+    const result = await pool.query(sql, values);
+    return result.rows[0];
+};
+
+export const getStudentByUserId = async (userId) => {
+    const sql = `SELECT * FROM students WHERE user_id = $1`;
+    const values = [userId];
+    const result = await pool.query(sql, values);
+    return result.rows[0];
+};
+
+export const getTeacherByUserId = async (userId) => {
+    const sql = `SELECT * FROM teachers WHERE user_id = $1`;
+    const values = [userId];
     const result = await pool.query(sql, values);
     return result.rows[0];
 };
