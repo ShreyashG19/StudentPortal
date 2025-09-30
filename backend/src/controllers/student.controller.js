@@ -12,5 +12,8 @@ export const getStudents = asyncHandler(async (req, res) => {
 export const getStudent = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const student = await getStudentById(id);
+    if (!student) {
+        return res.status(404).json(new ApiResponse(404, "Student not found"));
+    }
     res.json(new ApiResponse(200, "Student fetched successfully", { student }));
 });

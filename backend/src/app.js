@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import studentsRoutes from "./routes/student.routes.js";
+import attendanceRoutes from "./routes/attendance.routes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/api/health", (req, res) => {
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentsRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 app.use(errorHandler);
 

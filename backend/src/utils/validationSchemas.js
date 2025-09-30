@@ -42,3 +42,15 @@ export const loginValidationSchema = joi.object({
         "string.max": "Password cannot exceed 128 characters",
     }),
 });
+
+export const attendanceSchema = Joi.object({
+    attendance: Joi.array()
+        .items(
+            Joi.object({
+                student_id: Joi.number().integer().positive().required(),
+                status: Joi.string().valid("Present", "Absent").required(),
+            }),
+        )
+        .min(1)
+        .required(),
+});
