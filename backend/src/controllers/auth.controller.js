@@ -1,12 +1,13 @@
 import config from "../config/config.js";
+import { createUser, getUserByEmail } from "../services/user.service.js";
 import {
     createStudent,
-    createTeacher,
-    createUser,
-    getUserByEmail,
     getStudentByUserId,
+} from "../services/student.service.js";
+import {
+    createTeacher,
     getTeacherByUserId,
-} from "../services/user.service.js";
+} from "../services/teacher.service.js";
 import { Role } from "../utils/enums.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
