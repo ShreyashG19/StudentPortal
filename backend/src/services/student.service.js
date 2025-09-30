@@ -14,3 +14,21 @@ export const getStudentByUserId = async (userId) => {
     const result = await pool.query(sql, values);
     return result.rows[0];
 };
+
+export const getAllStudents = async () => {
+    const sql = `SELECT s.id, name, email, role, user_id, class, roll_number
+                FROM users u
+                INNER JOIN students s ON s.user_id = u.id;`;
+    const result = await pool.query(sql);
+    return result.rows;
+};
+
+export const getStudentById = async (id) => {
+    const sql = `SELECT s.id, name, email, role, user_id, class, roll_number
+                FROM users u
+                INNER JOIN students s ON s.user_id = u.id
+                WHERE s.id = $1`;
+    const values = [id];
+    const result = await pool.query(sql, values);
+    return result.rows[0];
+};
