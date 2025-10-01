@@ -5,14 +5,17 @@ import {
     getAttendance,
     markAttendance,
 } from "../controllers/attendance.controller.js";
-import { validateAttendance } from "../middlewares/attendance.middleware.js";
+import {
+    checkSelfOrTeacherAccess,
+    validateAttendance,
+} from "../middlewares/attendance.middleware.js";
 
 const router = express.Router();
 
 router.get(
     "/:student_id",
     verifyToken,
-    authorizeRoles([Role.TEACHER]),
+    checkSelfOrTeacherAccess,
     getAttendance,
 );
 router.post(

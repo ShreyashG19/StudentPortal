@@ -74,9 +74,11 @@ export const login = asyncHandler(async (req, res) => {
         const student = await getStudentByUserId(user.id);
         user.class = student.class;
         user.roll_number = student.roll_number;
+        user.student_id = student.id;
     } else {
         const teacher = await getTeacherByUserId(user.id);
         user.subject = teacher.subject;
+        user.teacher_id = teacher.id;
     }
     res.cookie("token", token, {
         httpOnly: true,
