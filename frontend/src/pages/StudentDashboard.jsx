@@ -4,17 +4,8 @@ import Navbar from "../components/Navbar";
 import { getAttendance } from "../services/attendanceService";
 import { useAuth } from "../context/AuthContext";
 export default function StudentDashboard() {
-    const demoStudent = {
-        id: 5,
-        name: "Someone Student",
-        email: "s@gmail.com",
-        role: "student",
-        user_id: 11,
-        class: "12th",
-        roll_number: 5,
-    };
-    const data = demoStudent;
     const { user } = useAuth();
+    const data = user;
     // Modal state
     const [showModal, setShowModal] = useState(false);
     const [attendance, setAttendance] = useState([]);
@@ -65,24 +56,16 @@ export default function StudentDashboard() {
                     {/* Info Section */}
                     <div className="divide-y divide-gray-200">
                         <ProfileDescriptionItem
-                            label="Email"
-                            value={data.email}
+                            label="Roll Number"
+                            value={data.roll_number}
                         />
                         <ProfileDescriptionItem
                             label="Class"
                             value={data.class}
                         />
                         <ProfileDescriptionItem
-                            label="Roll Number"
-                            value={data.roll_number}
-                        />
-                        <ProfileDescriptionItem
-                            label="User ID"
-                            value={data.user_id}
-                        />
-                        <ProfileDescriptionItem
-                            label="Student ID"
-                            value={data.id}
+                            label="Email"
+                            value={data.email}
                         />
                     </div>
 
@@ -117,13 +100,13 @@ export default function StudentDashboard() {
                                 Loading...
                             </div>
                         ) : (
-                            <table className="w-full border mt-2">
+                            <table className="w-full border-2 border-gray-500 rounded-sm mt-2">
                                 <thead>
                                     <tr>
-                                        <th className="py-2 px-4 border-b text-left">
+                                        <th className="py-2 px-4 border-b text-center">
                                             Date
                                         </th>
-                                        <th className="py-2 px-4 border-b text-left">
+                                        <th className="py-2 px-4 border-b text-center">
                                             Status
                                         </th>
                                     </tr>
@@ -141,10 +124,10 @@ export default function StudentDashboard() {
                                     ) : (
                                         attendance.map((item, idx) => (
                                             <tr key={idx}>
-                                                <td className="py-2 px-4 border-b">
+                                                <td className="py-2 px-4 border-b text-center">
                                                     {item.date}
                                                 </td>
-                                                <td className="py-2 px-4 border-b">
+                                                <td className="py-2 px-4 border-b text-center">
                                                     {item.status}
                                                 </td>
                                             </tr>

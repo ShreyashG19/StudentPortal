@@ -25,6 +25,7 @@ export const markAllAttendance = async (attendanceList) => {
         await client.query("COMMIT");
     } catch (err) {
         await client.query("ROLLBACK");
+        err.message = "Today's attendance already submitted";
         throw err;
     } finally {
         client.release();
