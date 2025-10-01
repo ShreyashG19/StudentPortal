@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { getAllStudents } from "../services/studentService";
 import { useToast } from "../context/ToastContext";
-import { markAttendance } from "../services/attendanceService";
+import { getAttendance, markAttendance } from "../services/attendanceService";
 // const students = [
 //     { id: 1, name: "Alice Smith" },
 //     { id: 2, name: "Bob Johnson" },
@@ -15,6 +15,7 @@ function TeacherDashboard() {
     const [attendance, setAttendance] = useState({});
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const { user } = useAuth();
     const { showError, showSuccess, showLoading } = useToast();
     const teacherData = user;
@@ -65,6 +66,26 @@ function TeacherDashboard() {
         }
     };
 
+    const fetchAttendance = async (id) => {
+        setLoading(true);
+        let attendanceData = await getAttendance(id);
+        attendanceData = attendanceData.map((item) => ({
+            date: item.date.split("T")[0],
+            status: item.status,
+        }));
+        setAttendance(attendanceData);
+        setLoading(false);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setAttendance([]);
+    };
+    const handleViewAttendance = (id) => {
+        setShowModal(true);
+        fetchAttendance(id);
+    };
+
     return (
         <>
             <Navbar />
@@ -110,7 +131,12 @@ function TeacherDashboard() {
                                         key={student.id}
                                         className="flex items-center justify-between border-b-2 border-gray-200 pb-2"
                                     >
-                                        <span className="font-medium">
+                                        <span
+                                            onClick={() =>
+                                                handleViewAttendance(student.id)
+                                            }
+                                            className="font-medium hover:opacity-50 cursor-pointer"
+                                        >
                                             {student.name}
                                         </span>
                                         <div className="flex gap-2">
@@ -165,6 +191,67 @@ function TeacherDashboard() {
                     )}
                 </div>
             </div>
+
+            {/* Attendance Modal */}
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+                        <div className="mb-5 justify-between flex items-center">
+                            <h3 className="text-xl font-bold text-blue-700">
+                                Attendance
+                            </h3>
+                            <button
+                                onClick={handleCloseModal}
+                                className="bg-red-600 hover:bg-red-700 px-4 py-1 text-md text-white rounded-md cursor-pointer"
+                                aria-label="Close"
+                            >
+                                Close
+                            </button>
+                        </div>
+                        {loading ? (
+                            <div className="text-center py-8 text-gray-500">
+                                Loading...
+                            </div>
+                        ) : (
+                            <table className="w-full border-2 border-gray-500 rounded-sm mt-2">
+                                <thead>
+                                    <tr>
+                                        <th className="py-2 px-4 border-b text-center">
+                                            Date
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-center">
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {attendance.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan={2}
+                                                className="py-4 text-center text-gray-400"
+                                            >
+                                                No attendance data.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        attendance.map((item, idx) => (
+                                            <tr key={idx}>
+                                                <td className="py-2 px-4 border-b text-center">
+                                                    {item.date}
+                                                </td>
+                                                <td className="py-2 px-4 border-b text-center">
+                                                    {item.status}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </div>
+            )}
         </>
     );
 }
