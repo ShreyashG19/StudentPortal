@@ -1,4 +1,3 @@
--- Users Table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -7,17 +6,15 @@ CREATE TABLE users (
     role VARCHAR(20) CHECK (role IN ('student', 'teacher')) NOT NULL
 );
 
--- Students Table
 CREATE TABLE students (
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     class VARCHAR(50) NOT NULL,
-    roll_number SERIAL UNIQUE,  -- auto-increment integer
+    roll_number SERIAL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 
--- Teachers Table
 CREATE TABLE teachers (
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
@@ -25,12 +22,12 @@ CREATE TABLE teachers (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Attendance Table (Optional)
+
 CREATE TABLE attendance (
     id SERIAL PRIMARY KEY,
     student_id INT NOT NULL,
     date DATE NOT NULL,
     status VARCHAR(10) CHECK (status IN ('Present', 'Absent')) NOT NULL,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    UNIQUE (student_id, date) -- Ensures one attendance record per student per day
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
+
