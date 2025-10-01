@@ -2,17 +2,17 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../utils/enums";
-// Create context
+import { useToast } from "../context/ToastContext";
+import toast from "react-hot-toast";
 const AuthContext = createContext();
 
-// Provider component
 export function AuthProvider({ children }) {
-    const userFromLocalStorage = authService.getCurrentUser();
-    const [user, setUser] = useState(userFromLocalStorage);
-    const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); // start in loading
     const navigate = useNavigate();
+    const { showSuccess, showError, showLoading } = useToast();
 
-    const navigateByRole = async (role) => {
+    const navigateByRole = (role) => {
         if (role === Role.STUDENT) {
             navigate("/student/dashboard", { replace: true });
         } else if (role === Role.TEACHER) {
@@ -24,45 +24,58 @@ export function AuthProvider({ children }) {
 
     const login = async (email, password) => {
         try {
+            // setIsLoading(true);
+            showLoading("Logging in...");
             const data = await authService.login(email, password);
             setUser(data.user);
+            showSuccess("Login successful!");
             navigateByRole(data.user.role);
-            console.log(data);
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            showError(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const signup = async (name, email, password, role) => {
-        const data = await authService.signup(name, email, password, role);
-        setUser(data);
-        navigateByRole(data.role);
+        try {
+            // setIsLoading(true);
+            showLoading("Signing up...");
+            const data = await authService.signup(name, email, password, role);
+            showSuccess("Signup successful! please login");
+            navigate("/login", { replace: true });
+        } catch (err) {
+            console.error(err);
+            showError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const logout = () => {
         authService.logout();
         setUser(null);
-        navigate("/"); // redirect to login page
+        showSuccess("Logout successful!");
+        navigate("/login", { replace: true });
     };
 
     useEffect(() => {
+        // restore user from storage on first load
         const currentUser = authService.getCurrentUser();
-        console.log("current user", currentUser);
         if (currentUser) {
             setUser(currentUser);
-            navigateByRole(currentUser.role);
-        } else {
-            navigate("/", { replace: true });
         }
+        setIsLoading(false);
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout }}>
+        <AuthContext.Provider
+            value={{ user, isLoading, login, signup, logout }}
+        >
             {children}
         </AuthContext.Provider>
     );
 }
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
