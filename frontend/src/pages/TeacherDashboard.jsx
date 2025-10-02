@@ -48,6 +48,18 @@ function TeacherDashboard() {
         fetchStudents();
     }, []);
 
+    // Reset attendance state when modal closes
+    useEffect(() => {
+        if (!showModal && students.length > 0) {
+            // Re-initialize attendance to "Present" for all students
+            const initialAttendance = students.reduce((acc, student) => {
+                acc[student.id] = "Present";
+                return acc;
+            }, {});
+            setAttendance(initialAttendance);
+        }
+    }, [showModal, students]);
+
     const handleToggle = (studentId, status) => {
         setAttendance((prev) => ({
             ...prev,
