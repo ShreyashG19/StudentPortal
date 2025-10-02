@@ -180,89 +180,101 @@ function TeacherDashboard() {
                             </span>
                         </div>
                     )}
-                    {!loading && (
-                        <div>
-                            <h3 className="text-lg font-bold mb-4 text-blue-700 flex items-center gap-2">
-                                <UserCheck className="w-5 h-5" />
-                                Mark Attendance
-                            </h3>
-                            <div className="space-y-4">
-                                {students.map((student) => (
-                                    <div
-                                        key={student.id}
-                                        className="flex items-center justify-between border-b-2 border-gray-200 pb-2"
-                                    >
-                                        <span
-                                            onClick={() =>
-                                                handleViewAttendance(student.id)
-                                            }
-                                            className="font-medium hover:opacity-50 cursor-pointer flex items-center gap-1"
+                    {!loading &&
+                        (students.length === 0 ? (
+                            <div className="text-center py-12">
+                                <Users className="w-6 h-6 mx-auto text-gray-400" />
+                                <p className="mt-4 text-gray-500 font-medium">
+                                    No student data found.
+                                </p>
+                            </div>
+                        ) : (
+                            <div>
+                                <h3 className="text-lg font-bold mb-4 text-blue-700 flex items-center gap-2">
+                                    <UserCheck className="w-5 h-5" />
+                                    Mark Attendance
+                                </h3>
+                                <div className="space-y-4">
+                                    {students.map((student) => (
+                                        <div
+                                            key={student.id}
+                                            className="flex items-center justify-between border-b-2 border-gray-200 pb-2"
                                         >
-                                            <User className="w-4 h-4 text-blue-600" />
-                                            {student.name}
-                                            <Eye
-                                                className="w-4 h-4 text-gray-400 ml-2"
-                                                title="View Attendance"
-                                            />
-                                        </span>
-                                        <div className="flex gap-2">
-                                            <button
-                                                type="button"
-                                                className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
-                                                    attendance[student.id] ===
-                                                    "Present"
-                                                        ? "bg-green-600 text-white"
-                                                        : "bg-gray-200 text-gray-700"
-                                                }`}
+                                            <span
                                                 onClick={() =>
-                                                    handleToggle(
+                                                    handleViewAttendance(
                                                         student.id,
-                                                        "Present",
                                                     )
                                                 }
+                                                className="font-medium hover:opacity-50 cursor-pointer flex items-center gap-1"
                                             >
-                                                Present
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
-                                                    attendance[student.id] ===
-                                                    "Absent"
-                                                        ? "bg-red-600 text-white"
-                                                        : "bg-gray-200 text-gray-700"
-                                                }`}
-                                                onClick={() =>
-                                                    handleToggle(
-                                                        student.id,
-                                                        "Absent",
-                                                    )
-                                                }
-                                            >
-                                                Absent
-                                            </button>
+                                                <User className="w-4 h-4 text-blue-600" />
+                                                {student.name}
+                                                <Eye
+                                                    className="w-4 h-4 text-gray-400 ml-2"
+                                                    title="View Attendance"
+                                                />
+                                            </span>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    type="button"
+                                                    className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
+                                                        attendance[
+                                                            student.id
+                                                        ] === "Present"
+                                                            ? "bg-green-600 text-white"
+                                                            : "bg-gray-200 text-gray-700"
+                                                    }`}
+                                                    onClick={() =>
+                                                        handleToggle(
+                                                            student.id,
+                                                            "Present",
+                                                        )
+                                                    }
+                                                >
+                                                    Present
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
+                                                        attendance[
+                                                            student.id
+                                                        ] === "Absent"
+                                                            ? "bg-red-600 text-white"
+                                                            : "bg-gray-200 text-gray-700"
+                                                    }`}
+                                                    onClick={() =>
+                                                        handleToggle(
+                                                            student.id,
+                                                            "Absent",
+                                                        )
+                                                    }
+                                                >
+                                                    Absent
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                                {/* Last submitted date text */}
+                                <div className="flex justify-start mt-6 items-center gap-2">
+                                    <Clock className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-500 font-medium text-sm">
+                                        Last submitted time : {lastSubmitted}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={submitting}
+                                    className="mt-8 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-60 flex items-center justify-center gap-2"
+                                >
+                                    <CheckCircle className="w-5 h-5" />
+                                    {submitting
+                                        ? "Submitting..."
+                                        : "Submit Attendance"}
+                                </button>
                             </div>
-                            {/* Last submitted date text */}
-                            <div className="flex justify-start mt-6 items-center gap-2">
-                                <Clock className="w-4 h-4 text-gray-400" />
-                                <span className="text-gray-500 font-medium text-sm">
-                                    Last submitted time : {lastSubmitted}
-                                </span>
-                            </div>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={submitting}
-                                className="mt-8 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-60 flex items-center justify-center gap-2"
-                            >
-                                <CheckCircle className="w-5 h-5" />
-                                {submitting
-                                    ? "Submitting..."
-                                    : "Submit Attendance"}
-                            </button>
-                        </div>
-                    )}
+                        ))}
                 </div>
             </div>
 
