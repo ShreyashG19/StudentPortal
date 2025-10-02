@@ -3,7 +3,11 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { getAllStudents } from "../services/studentService";
 import { useToast } from "../context/ToastContext";
-import { getAttendance, markAttendance } from "../services/attendanceService";
+import {
+    getAttendance,
+    markAttendance,
+    getLastSubmittedTime,
+} from "../services/attendanceService";
 // const students = [
 //     { id: 1, name: "Alice Smith" },
 //     { id: 2, name: "Bob Johnson" },
@@ -16,6 +20,7 @@ function TeacherDashboard() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [lastSubmitted, setLastSubmitted] = useState(getLastSubmittedTime());
     const { user } = useAuth();
     const { showError, showSuccess, showLoading } = useToast();
     const teacherData = user;
@@ -59,6 +64,7 @@ function TeacherDashboard() {
         try {
             const data = await markAttendance(attendanceData);
             showSuccess("Attendance submitted successfully!");
+            setLastSubmitted(getLastSubmittedTime());
             setSubmitting(false);
         } catch (error) {
             showError(error.message);
@@ -69,10 +75,14 @@ function TeacherDashboard() {
     const fetchAttendance = async (id) => {
         setLoading(true);
         let attendanceData = await getAttendance(id);
-        attendanceData = attendanceData.map((item) => ({
-            date: item.date.split("T")[0],
-            status: item.status,
-        }));
+        console.log("Attendance Data:", attendanceData);
+        attendanceData = attendanceData.map((item) => {
+            return {
+                date: item.date.split("T")[0],
+                time: item.time,
+                status: item.status,
+            };
+        });
         setAttendance(attendanceData);
         setLoading(false);
     };
@@ -178,6 +188,12 @@ function TeacherDashboard() {
                                     </div>
                                 ))}
                             </div>
+                            {/* Last submitted date text */}
+                            <div className="flex justify-start mt-6">
+                                <span className="text-gray-500 font-medium text-sm">
+                                    Last submitted time : {lastSubmitted}
+                                </span>
+                            </div>
                             <button
                                 onClick={handleSubmit}
                                 disabled={submitting}
@@ -220,6 +236,9 @@ function TeacherDashboard() {
                                             Date
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            Time
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-center">
                                             Status
                                         </th>
                                     </tr>
@@ -228,7 +247,7 @@ function TeacherDashboard() {
                                     {attendance.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan={2}
+                                                colSpan={3}
                                                 className="py-4 text-center text-gray-400"
                                             >
                                                 No attendance data.
@@ -239,6 +258,9 @@ function TeacherDashboard() {
                                             <tr key={idx}>
                                                 <td className="py-2 px-4 border-b text-center">
                                                     {item.date}
+                                                </td>
+                                                <td className="py-2 px-4 border-b text-center">
+                                                    {item.time}
                                                 </td>
                                                 <td className="py-2 px-4 border-b text-center">
                                                     {item.status}

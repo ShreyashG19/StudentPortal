@@ -15,10 +15,14 @@ export default function StudentDashboard() {
     const fetchAttendance = async () => {
         setLoading(true);
         let attendanceData = await getAttendance(user.student_id);
-        attendanceData = attendanceData.map((item) => ({
-            date: item.date.split("T")[0],
-            status: item.status,
-        }));
+        attendanceData = attendanceData.map((item) => {
+            const [date, time] = item.date.split("T");
+            return {
+                date,
+                time: time ? time.split(".")[0] : "", // Remove milliseconds if present
+                status: item.status,
+            };
+        });
         setAttendance(attendanceData);
         setLoading(false);
     };
@@ -107,6 +111,9 @@ export default function StudentDashboard() {
                                             Date
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            Time
+                                        </th>
+                                        <th className="py-2 px-4 border-b text-center">
                                             Status
                                         </th>
                                     </tr>
@@ -115,7 +122,7 @@ export default function StudentDashboard() {
                                     {attendance.length === 0 ? (
                                         <tr>
                                             <td
-                                                colSpan={2}
+                                                colSpan={3}
                                                 className="py-4 text-center text-gray-400"
                                             >
                                                 No attendance data.
@@ -126,6 +133,9 @@ export default function StudentDashboard() {
                                             <tr key={idx}>
                                                 <td className="py-2 px-4 border-b text-center">
                                                     {item.date}
+                                                </td>
+                                                <td className="py-2 px-4 border-b text-center">
+                                                    {item.time}
                                                 </td>
                                                 <td className="py-2 px-4 border-b text-center">
                                                     {item.status}

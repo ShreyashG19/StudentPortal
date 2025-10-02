@@ -27,6 +27,7 @@ export const markAttendance = async (attendance) => {
             { attendance },
             { withCredentials: true },
         );
+        setLastSubmittedTime();
         return response.data.data.attendance;
     } catch (err) {
         const message =
@@ -35,4 +36,24 @@ export const markAttendance = async (attendance) => {
             "Mark attendance failed";
         throw new Error(message);
     }
+};
+
+export const getLastSubmittedTime = () => {
+    const lastSubmitted = localStorage.getItem("lastSubmitted");
+    return lastSubmitted ? lastSubmitted : "";
+};
+
+export const setLastSubmittedTime = () => {
+    const now = new Date();
+    const date = now.toLocaleDateString("en-CA", {
+        timeZone: "Asia/Kolkata",
+    });
+
+    // HH:MM
+    const time = now.toLocaleTimeString("en-GB", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+    localStorage.setItem("lastSubmitted", date + ", " + time);
 };

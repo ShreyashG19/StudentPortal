@@ -11,21 +11,38 @@ export const markAllAttendance = async (attendanceList) => {
     const client = await pool.connect();
     try {
         await client.query("BEGIN");
+
+        //ISO date
+        const now = new Date();
+        const date = now.toLocaleDateString("en-CA", {
+            timeZone: "Asia/Kolkata",
+        });
+
+        // HH:MM
+        const time = now.toLocaleTimeString("en-GB", {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
         for (const record of attendanceList) {
             const { student_id, status } = record;
 
-            const date = new Date().toISOString().split("T")[0];
-
             const insertQuery = `
-                        INSERT INTO attendance(student_id, date, status)
-                        VALUES($1, $2, $3)
+                        INSERT INTO attendance(student_id, date, time, status)
+                        VALUES($1, $2, $3, $4)
                     `;
-            await client.query(insertQuery, [student_id, date, status]);
+            await client.query(insertQuery, [student_id, date, time, status]);
         }
         await client.query("COMMIT");
     } catch (err) {
         await client.query("ROLLBACK");
-        err.message = "Today's attendance already submitted";
+        console.log(err);
+        if (err.code === "23505") {
+            err.message = "Attendance just submitted, wait for some time";
+            throw err;
+        }
+        err.message = "Something went wrong";
         throw err;
     } finally {
         client.release();
