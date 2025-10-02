@@ -7,12 +7,17 @@ import attendanceRoutes from "./routes/attendance.routes.js";
 import cors from "cors";
 
 const app = express();
+// const corsOptions = {
+//     origin: [
+//         "http://localhost:5174",
+//         "http://localhost:5173",
+//         "http://localhost:3000",
+//     ],
+//     credentials: true,
+// };
+
 const corsOptions = {
-    origin: [
-        "http://localhost:5174",
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ],
+    origin: true,
     credentials: true,
 };
 
