@@ -1,0 +1,414 @@
+openapi: 3.0.3
+info:
+    title: StudentPortal API
+    version: 1.0.0
+    description: API documentation for the StudentPortal backend
+servers:
+    - url: http://localhost:3000
+      description: Local development server
+
+components:
+    securitySchemes:
+        cookieAuth:
+            type: apiKey
+            in: cookie
+            name: token
+
+    schemas:
+        ApiResponse:
+            type: object
+            properties:
+                statusCode:
+                    type: integer
+                    example: 200
+                message:
+                    type: string
+                    example: "Success"
+                data:
+                    type: object
+                status:
+                    type: string
+                    example: success
+
+        ApiError:
+            type: object
+            properties:
+                statusCode:
+                    type: integer
+                    example: 400
+                message:
+                    type: string
+                    example: "Bad Request"
+                success:
+                    type: boolean
+                    example: false
+
+        User:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 1
+                name:
+                    type: string
+                    example: "John Doe"
+                email:
+                    type: string
+                    example: "john@example.com"
+                role:
+                    type: string
+                    example: student
+                class:
+                    type: string
+                    example: "12th"
+                subject:
+                    type: string
+                    example: "English"
+                roll_number:
+                    type: integer
+                    example: 10
+                student_id:
+                    type: integer
+                    example: 5
+                teacher_id:
+                    type: integer
+                    example: 2
+
+        Student:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 5
+                name:
+                    type: string
+                    example: "John Doe"
+                email:
+                    type: string
+                    example: "john@example.com"
+                role:
+                    type: string
+                    example: student
+                user_id:
+                    type: integer
+                    example: 1
+                class:
+                    type: string
+                    example: "12th"
+                roll_number:
+                    type: integer
+                    example: 10
+
+        AttendanceEntry:
+            type: object
+            properties:
+                student_id:
+                    type: integer
+                    example: 5
+                date:
+                    type: string
+                    format: date
+                    example: "2025-10-02"
+                time:
+                    type: string
+                    example: "09:30"
+                status:
+                    type: string
+                    enum: [Present, Absent]
+                    example: Present
+
+        AttendanceRequest:
+            type: object
+            properties:
+                attendance:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            student_id:
+                                type: integer
+                                example: 5
+                            status:
+                                type: string
+                                enum: [Present, Absent]
+                                example: Present
+                    minItems: 1
+            required: [attendance]
+
+        SignupRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                    example: "John Doe"
+                email:
+                    type: string
+                    example: "john@example.com"
+                password:
+                    type: string
+                    example: "strongpassword"
+                role:
+                    type: string
+                    enum: [student, teacher]
+                    example: student
+            required: [name, email, password, role]
+
+        LoginRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    example: "john@example.com"
+                password:
+                    type: string
+                    example: "strongpassword"
+            required: [email, password]
+
+        StudentsListResponse:
+            type: object
+            properties:
+                students:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/Student"
+
+        AttendanceListResponse:
+            type: object
+            properties:
+                attendance:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/AttendanceEntry"
+
+paths:
+    /api/health:
+        get:
+            summary: Health check
+            tags:
+                - Health
+            responses:
+                "200":
+                    description: Server is running
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: server is running!
+
+    /api/auth/signup:
+        post:
+            summary: Create a new user (student or teacher)
+            tags:
+                - Auth
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/SignupRequest"
+            responses:
+                "200":
+                    description: User created successfully
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/User"
+                "400":
+                    description: Validation or duplicate email
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+
+    /api/auth/login:
+        post:
+            summary: Login user and set JWT cookie
+            tags:
+                - Auth
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/LoginRequest"
+            responses:
+                "200":
+                    description: Login successful (cookie set)
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/User"
+                "400":
+                    description: Incorrect credentials
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+
+    /api/auth/logout:
+        post:
+            summary: Logout user (clear token cookie)
+            tags:
+                - Auth
+            responses:
+                "200":
+                    description: Logout successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiResponse"
+
+    /api/students:
+        get:
+            summary: Get all students (teacher-only)
+            description: Requires authentication and teacher role.
+            tags:
+                - Students
+            security:
+                - cookieAuth: []
+            responses:
+                "200":
+                    description: Students fetched successfully
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              $ref: "#/components/schemas/StudentsListResponse"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+
+    /api/students/{id}:
+        get:
+            summary: Get a single student by id (self or teacher)
+            description: Requires authentication. Student can access own data; teachers can access any.
+            tags:
+                - Students
+            security:
+                - cookieAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                      type: integer
+                  required: true
+                  description: Student id
+            responses:
+                "200":
+                    description: Student fetched successfully
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  student:
+                                                      $ref: "#/components/schemas/Student"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+                "404":
+                    description: Student not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+
+    /api/attendance/{student_id}:
+        get:
+            summary: Get attendance for a student (self or teacher)
+            tags:
+                - Attendance
+            security:
+                - cookieAuth: []
+            parameters:
+                - in: path
+                  name: student_id
+                  schema:
+                      type: integer
+                  required: true
+                  description: Student id
+            responses:
+                "200":
+                    description: Attendance fetched successfully
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              $ref: "#/components/schemas/AttendanceListResponse"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+
+    /api/attendance/mark:
+        post:
+            summary: Mark attendance for multiple students (teacher-only)
+            description: Requires authentication and teacher role.
+            tags:
+                - Attendance
+            security:
+                - cookieAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AttendanceRequest"
+            responses:
+                "200":
+                    description: Attendance updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/ApiResponse"
+                                    - properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  attendance:
+                                                      $ref: "#/components/schemas/AttendanceListResponse"
+                "400":
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ApiError"
