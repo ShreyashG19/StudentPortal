@@ -29,6 +29,7 @@ export function AuthProvider({ children }) {
             const data = await authService.login(email, password);
             setUser(data.user);
             showSuccess("Login successful!");
+            console.log(data.user);
             navigateByRole(data.user.role);
         } catch (err) {
             console.error(err);

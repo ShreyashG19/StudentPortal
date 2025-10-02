@@ -20,7 +20,17 @@ export const markAttendance = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Attendance is required");
     }
 
-    await markAllAttendance(attendance);
+    try {
+        await markAllAttendance(attendance);
+    } catch (err) {
+        if (err.code === "23505") {
+            throw new ApiError(
+                400,
+                "Attendance just submitted, wait for some time",
+            );
+        }
+        err.message = "Something went wrong";
+    }
 
     res.json(
         new ApiResponse(200, "Attendance updated successfully", {

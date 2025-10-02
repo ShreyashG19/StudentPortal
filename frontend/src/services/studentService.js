@@ -1,14 +1,9 @@
-import config from "../config";
-import axios from "axios";
-
-const API_BASE_URL = config.apiUrl;
+import { apiGet } from "./api";
 
 export const getAllStudents = async () => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/students`, {
-            withCredentials: true,
-        });
-        return response.data.data.students;
+        const response = await apiGet(`/students`);
+        return response.data.students;
     } catch (err) {
         const message =
             err.response?.data?.message || err.message || "Get students failed";
@@ -18,10 +13,8 @@ export const getAllStudents = async () => {
 
 export const getStudent = async (id) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/students/${id}`, {
-            withCredentials: true,
-        });
-        return response.data.data.student;
+        const response = await apiGet(`/students/${id}`);
+        return response.data.student;
     } catch (err) {
         const message =
             err.response?.data?.message || err.message || "Get student failed";

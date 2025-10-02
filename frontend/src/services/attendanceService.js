@@ -1,16 +1,10 @@
-import config from "../config";
-import axios from "axios";
-
-const API_BASE_URL = config.apiUrl;
+import { apiGet, apiPost } from "./api";
 
 export const getAttendance = async (studentId) => {
     try {
         console.log("Student ID:", studentId);
-        const response = await axios.get(
-            `${API_BASE_URL}/attendance/${studentId}`,
-            { withCredentials: true },
-        );
-        return response.data.data.attendance;
+        const response = await apiGet(`/attendance/${studentId}`);
+        return response.data.attendance;
     } catch (err) {
         const message =
             err.response?.data?.message ||
@@ -22,13 +16,9 @@ export const getAttendance = async (studentId) => {
 
 export const markAttendance = async (attendance) => {
     try {
-        const response = await axios.post(
-            `${API_BASE_URL}/attendance/mark`,
-            { attendance },
-            { withCredentials: true },
-        );
+        const response = await apiPost(`/attendance/mark`, { attendance });
         setLastSubmittedTime();
-        return response.data.data.attendance;
+        return response.data.attendance;
     } catch (err) {
         const message =
             err.response?.data?.message ||

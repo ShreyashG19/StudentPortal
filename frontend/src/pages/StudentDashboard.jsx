@@ -112,7 +112,7 @@ export default function StudentDashboard() {
             {/* Attendance Modal */}
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+                    <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative flex flex-col">
                         <div className="mb-5 justify-between flex items-center">
                             <h3 className="text-xl font-bold text-blue-700 flex items-center gap-2">
                                 <CalendarDays className="w-5 h-5" />
@@ -132,61 +132,66 @@ export default function StudentDashboard() {
                                 Loading...
                             </div>
                         ) : (
-                            <table className="w-full border-2 border-gray-500 rounded-sm mt-2">
-                                <thead>
-                                    <tr>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <CalendarDays className="inline w-4 h-4 mr-1" />
-                                            Date
-                                        </th>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <Clock className="inline w-4 h-4 mr-1" />
-                                            Time
-                                        </th>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <CheckCircle className="inline w-4 h-4 mr-1" />
-                                            Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {attendance.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan={3}
-                                                className="py-4 text-center text-gray-400"
-                                            >
-                                                No attendance data.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        attendance.map((item, idx) => (
-                                            <tr key={idx}>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.date}
-                                                </td>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.time}
-                                                </td>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.status ===
-                                                    "Present" ? (
-                                                        <span className="flex items-center justify-center gap-1 text-green-600">
-                                                            <CheckCircle className="w-4 h-4" />
-                                                            Present
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center justify-center gap-1 text-red-600">
-                                                            <X className="w-4 h-4" />
-                                                            Absent
-                                                        </span>
-                                                    )}
-                                                </td>
+                            <div className="mt-2">
+                                {/* Make the table container scrollable when content is long */}
+                                <div className="max-h-64 overflow-y-auto border-2 border-gray-500 rounded-sm">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr>
+                                                <th className="py-2 px-4 border-b text-center">
+                                                    <CalendarDays className="inline w-4 h-4 mr-1" />
+                                                    Date
+                                                </th>
+                                                <th className="py-2 px-4 border-b text-center">
+                                                    <Clock className="inline w-4 h-4 mr-1" />
+                                                    Time
+                                                </th>
+                                                <th className="py-2 px-4 border-b text-center">
+                                                    <CheckCircle className="inline w-4 h-4 mr-1" />
+                                                    Status
+                                                </th>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        </thead>
+                                        <tbody>
+                                            {attendance.length === 0 ? (
+                                                <tr>
+                                                    <td
+                                                        colSpan={3}
+                                                        className="py-4 text-center text-gray-400"
+                                                    >
+                                                        No attendance data.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                attendance.map((item, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.date}
+                                                        </td>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.time}
+                                                        </td>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.status ===
+                                                            "Present" ? (
+                                                                <span className="flex items-center justify-center gap-1 text-green-600">
+                                                                    <CheckCircle className="w-4 h-4" />
+                                                                    Present
+                                                                </span>
+                                                            ) : (
+                                                                <span className="flex items-center justify-center gap-1 text-red-600">
+                                                                    <X className="w-4 h-4" />
+                                                                    Absent
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>

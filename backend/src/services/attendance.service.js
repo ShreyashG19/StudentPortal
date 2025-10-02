@@ -38,11 +38,6 @@ export const markAllAttendance = async (attendanceList) => {
     } catch (err) {
         await client.query("ROLLBACK");
         console.log(err);
-        if (err.code === "23505") {
-            err.message = "Attendance just submitted, wait for some time";
-            throw err;
-        }
-        err.message = "Something went wrong";
         throw err;
     } finally {
         client.release();

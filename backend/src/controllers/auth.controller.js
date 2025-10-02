@@ -80,18 +80,11 @@ export const login = asyncHandler(async (req, res) => {
         user.subject = teacher.subject;
         user.teacher_id = teacher.id;
     }
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
 
     delete user.password_hash;
-    res.json(new ApiResponse(200, "Login successful", { user }));
+    res.json(new ApiResponse(200, "Login successful", { user, token }));
 });
 
 export const logout = asyncHandler(async (req, res) => {
-    res.clearCookie("token");
     res.json(new ApiResponse(200, "Logout successful"));
 });

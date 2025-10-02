@@ -15,9 +15,14 @@ export default function Signup() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const passwordValue = watch("password", "");
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+        // prevent double submits and show loading state
+        if (submitting) return;
+        setSubmitting(true);
+
         // Trim inputs and remove confirmPassword before sending to backend
         const payload = {
             name: data.name.trim(),
@@ -26,7 +31,18 @@ export default function Signup() {
             role: data.role,
         };
 
-        signup(payload.name, payload.email, payload.password, payload.role);
+        try {
+            await signup(
+                payload.name,
+                payload.email,
+                payload.password,
+                payload.role,
+            );
+        } catch (err) {
+            console.error("Signup error:", err);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -260,15 +276,18 @@ export default function Signup() {
                     {/* Signup Button */}
                     <button
                         type="submit"
-                        disabled={!isValid}
-                        className={`w-full text-white py-2 rounded-lg transition ${
-                            isValid
-                                ? "bg-blue-600 hover:bg-blue-700"
-                                : "bg-gray-300 cursor-not-allowed"
+                        disabled={!isValid || submitting}
+                        className={`w-full text-white py-2 rounded-lg transition flex items-center justify-center ${
+                            !isValid
+                                ? "bg-gray-300 cursor-not-allowed"
+                                : submitting
+                                ? "bg-blue-600 opacity-70 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700"
                         }`}
                         aria-disabled={!isValid}
+                        aria-busy={submitting}
                     >
-                        Signup
+                        {submitting ? "Signing up..." : "Signup"}
                     </button>
                 </form>
 

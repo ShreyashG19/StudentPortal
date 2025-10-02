@@ -32,10 +32,14 @@ export const authorizeRoles = (roles) => (req, res, next) => {
 };
 
 export const verifyToken = (req, res, next) => {
-    const token = req.cookies.token;
-    if (!token) {
-        return next(new ApiError(401, "Unauthorized"));
+    const authHeader = req.headers["authorization"];
+
+    console.log("Auth header:", authHeader);
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return next(new ApiError(401, "Unauthorized: Missing token"));
     }
+
+    const token = authHeader.split(" ")[1];
 
     jwt.verify(token, config.jwtSecret, (err, decoded) => {
         if (err) {
