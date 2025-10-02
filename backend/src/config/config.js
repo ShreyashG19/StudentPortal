@@ -8,9 +8,9 @@ const config = {
 };
 
 // List of required environment variables
-const requiredEnvVars = ["POSTGRES_URL", "JWT_SECRET"];
+const requiredEnvVars = ["POSTGRES_URL", "JWT_SECRET", "PORT"];
 
-// Check for missing environment variables
+// check misssing
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
@@ -19,7 +19,7 @@ if (missingEnvVars.length > 0) {
             ", ",
         )}`,
     );
-    process.exit(1); // Exit with a failure code
+    process.exit(1); //terminate
 }
 
 export default config;
