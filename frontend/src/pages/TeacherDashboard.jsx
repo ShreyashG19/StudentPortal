@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
-import { getAllStudents } from "../services/studentService";
+import { getAllStudents, getStudent } from "../services/studentService";
 import { useToast } from "../context/ToastContext";
 import {
     getAttendance,
@@ -26,6 +26,10 @@ import {
 function TeacherDashboard() {
     const [students, setStudents] = useState([]);
     const [attendance, setAttendance] = useState({});
+    const [attendanceRecords, setAttendanceRecords] = useState([]);
+    const [attendanceLoading, setAttendanceLoading] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [studentLoading, setStudentLoading] = useState(false);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -94,26 +98,48 @@ function TeacherDashboard() {
     };
 
     const fetchAttendance = async (id) => {
-        setLoading(true);
-        let attendanceData = await getAttendance(id);
-        console.log("Attendance Data:", attendanceData);
-        attendanceData = attendanceData.map((item) => {
-            return {
-                date: item.date.split("T")[0],
-                time: item.time,
-                status: item.status,
-            };
-        });
-        setAttendance(attendanceData);
-        setLoading(false);
+        setAttendanceLoading(true);
+        try {
+            let attendanceData = await getAttendance(id);
+            attendanceData = attendanceData.map((item) => {
+                return {
+                    date: item.date.split("T")[0],
+                    time: item.time,
+                    status: item.status,
+                };
+            });
+            setAttendanceRecords(attendanceData);
+        } catch (err) {
+            showError(err.message || "Failed to load attendance");
+            setAttendanceRecords([]);
+        } finally {
+            setAttendanceLoading(false);
+        }
     };
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setAttendance([]);
+        setAttendanceRecords([]);
+        setSelectedStudent(null);
+        setStudentLoading(false);
+        setAttendanceLoading(false);
     };
-    const handleViewAttendance = (id) => {
+
+    const handleViewAttendance = async (id) => {
         setShowModal(true);
+        // fetch student info first
+        try {
+            setStudentLoading(true);
+            const student = await getStudent(id);
+            setSelectedStudent(student);
+        } catch (err) {
+            showError(err.message || "Failed to load student info");
+            setSelectedStudent(null);
+        } finally {
+            setStudentLoading(false);
+        }
+
+        // then fetch attendance
         fetchAttendance(id);
     };
 
@@ -194,7 +220,6 @@ function TeacherDashboard() {
                                                     )
                                                 }
                                             >
-                                                
                                                 Present
                                             </button>
                                             <button
@@ -212,7 +237,6 @@ function TeacherDashboard() {
                                                     )
                                                 }
                                             >
-                                                
                                                 Absent
                                             </button>
                                         </div>
@@ -259,66 +283,107 @@ function TeacherDashboard() {
                                 Close
                             </button>
                         </div>
-                        {loading ? (
+                        {attendanceLoading ? (
                             <div className="text-center py-8 text-gray-500">
-                                Loading...
+                                Loading attendance...
                             </div>
                         ) : (
-                            <table className="w-full border-2 border-gray-500 rounded-sm mt-2">
-                                <thead>
-                                    <tr>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <CalendarDays className="inline w-4 h-4 mr-1" />
-                                            Date
-                                        </th>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <Clock className="inline w-4 h-4 mr-1" />
-                                            Time
-                                        </th>
-                                        <th className="py-2 px-4 border-b text-center">
-                                            <CheckCircle className="inline w-4 h-4 mr-1" />
-                                            Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {attendance.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan={3}
-                                                className="py-4 text-center text-gray-400"
-                                            >
-                                                No attendance data.
-                                            </td>
-                                        </tr>
+                            <>
+                                <div className="mb-4 p-3 border-2 border-gray-300 rounded-md bg-gray-50">
+                                    {studentLoading ? (
+                                        <div className="text-gray-500">
+                                            Loading student...
+                                        </div>
+                                    ) : selectedStudent ? (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <User className="w-6 h-6 text-blue-700" />
+                                            </div>
+                                            <div>
+                                                <div className="font-semibold text-blue-700">
+                                                    {selectedStudent.name}
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                    Roll No:{" "}
+                                                    {
+                                                        selectedStudent.roll_number
+                                                    }
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                    Class:{" "}
+                                                    {selectedStudent.class}
+                                                </div>
+                                                <div className="text-sm text-gray-600">
+                                                    Email:{" "}
+                                                    {selectedStudent.email}
+                                                </div>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        attendance.map((item, idx) => (
-                                            <tr key={idx}>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.date}
-                                                </td>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.time}
-                                                </td>
-                                                <td className="py-2 px-4 border-b text-center">
-                                                    {item.status ===
-                                                    "Present" ? (
-                                                        <span className="flex items-center justify-center gap-1 text-green-600">
-                                                            <CheckCircle className="w-4 h-4" />
-                                                            Present
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center justify-center gap-1 text-red-600">
-                                                            <X className="w-4 h-4" />
-                                                            Absent
-                                                        </span>
-                                                    )}
+                                        <div className="text-gray-500">
+                                            No student selected.
+                                        </div>
+                                    )}
+                                </div>
+
+                                <table className="w-full border-2 border-gray-500 rounded-sm mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th className="py-2 px-4 border-b text-center">
+                                                <CalendarDays className="inline w-4 h-4 mr-1" />
+                                                Date
+                                            </th>
+                                            <th className="py-2 px-4 border-b text-center">
+                                                <Clock className="inline w-4 h-4 mr-1" />
+                                                Time
+                                            </th>
+                                            <th className="py-2 px-4 border-b text-center">
+                                                <CheckCircle className="inline w-4 h-4 mr-1" />
+                                                Status
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {attendanceRecords.length === 0 ? (
+                                            <tr>
+                                                <td
+                                                    colSpan={3}
+                                                    className="py-4 text-center text-gray-400"
+                                                >
+                                                    No attendance data.
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        ) : (
+                                            attendanceRecords.map(
+                                                (item, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.date}
+                                                        </td>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.time}
+                                                        </td>
+                                                        <td className="py-2 px-4 border-b text-center">
+                                                            {item.status ===
+                                                            "Present" ? (
+                                                                <span className="flex items-center justify-center gap-1 text-green-600">
+                                                                    <CheckCircle className="w-4 h-4" />
+                                                                    Present
+                                                                </span>
+                                                            ) : (
+                                                                <span className="flex items-center justify-center gap-1 text-red-600">
+                                                                    <X className="w-4 h-4" />
+                                                                    Absent
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ),
+                                            )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </>
                         )}
                     </div>
                 </div>

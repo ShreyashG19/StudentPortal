@@ -9,16 +9,24 @@ export default function Signup() {
         register,
         handleSubmit,
         watch,
-        formState: { errors },
-    } = useForm();
+        formState: { errors, isValid },
+    } = useForm({ mode: "onChange" });
     const { signup } = useAuth();
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const passwordValue = watch("password", "");
 
     const onSubmit = (data) => {
-        // Remove confirmPassword before sending to backend
-        signup(data.name, data.email, data.password, data.role);
+        // Trim inputs and remove confirmPassword before sending to backend
+        const payload = {
+            name: data.name.trim(),
+            email: data.email.trim(),
+            password: data.password,
+            role: data.role,
+        };
+
+        signup(payload.name, payload.email, payload.password, payload.role);
     };
 
     return (
@@ -48,6 +56,12 @@ export default function Signup() {
                                         value: 2,
                                         message:
                                             "Name must be at least 2 characters",
+                                    },
+                                    pattern: {
+                                        // allow letters, spaces, dots and hyphens
+                                        value: /^[A-Za-z ]+$/,
+                                        message:
+                                            "Name contains invalid characters",
                                     },
                                 })}
                             />
@@ -80,6 +94,7 @@ export default function Signup() {
                                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                         message: "Invalid email address",
                                     },
+                                    setValueAs: (v) => v && v.toLowerCase(),
                                 })}
                             />
                         </div>
@@ -108,9 +123,15 @@ export default function Signup() {
                                 {...register("password", {
                                     required: "Password is required",
                                     minLength: {
-                                        value: 6,
+                                        value: 8,
                                         message:
-                                            "Password must be at least 6 characters",
+                                            "Password must be at least 8 characters",
+                                    },
+                                    pattern: {
+                                        // At least one uppercase, one lowercase, one number
+                                        value: /(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                                        message:
+                                            "Password must include upper and lower case letters and a number",
                                     },
                                 })}
                             />
@@ -136,6 +157,15 @@ export default function Signup() {
                         {errors.password && (
                             <p className="text-red-500 text-sm mt-1">
                                 {errors.password.message}
+                            </p>
+                        )}
+                        {!errors.password && passwordValue && (
+                            <p className="text-sm text-gray-500 mt-1">
+                                {passwordValue.length < 8
+                                    ? "Weak password — try 8+ chars"
+                                    : /(?=.*[A-Z])(?=.*\d)/.test(passwordValue)
+                                    ? "Strong password"
+                                    : "Consider adding uppercase letters and numbers"}
                             </p>
                         )}
                     </div>
@@ -230,7 +260,13 @@ export default function Signup() {
                     {/* Signup Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        disabled={!isValid}
+                        className={`w-full text-white py-2 rounded-lg transition ${
+                            isValid
+                                ? "bg-blue-600 hover:bg-blue-700"
+                                : "bg-gray-300 cursor-not-allowed"
+                        }`}
+                        aria-disabled={!isValid}
                     >
                         Signup
                     </button>

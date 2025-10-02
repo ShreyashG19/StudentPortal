@@ -15,9 +15,9 @@ export const signupValidationSchema = joi.object({
         "string.email": "Email must be valid",
     }),
 
-    password: Joi.string().min(6).max(128).required().messages({
+    password: Joi.string().min(8).max(128).required().messages({
         "string.empty": "Password is required",
-        "string.min": "Password must be at least 6 characters",
+        "string.min": "Password must be at least 8 characters",
         "string.max": "Password cannot exceed 128 characters",
     }),
 

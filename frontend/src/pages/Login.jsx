@@ -13,10 +13,19 @@ export default function Login() {
     const { login } = useAuth();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const onSubmit = (data) => {
+        // prevent double submits and show loading state
+        if (submitting) return;
+        setSubmitting(true);
         console.log("Login data:", data);
-        login(data.email, data.password);
+        Promise.resolve(login(data.email, data.password))
+            .catch((err) => {
+                // login already shows toast; still log for debugging
+                console.error("Login error:", err);
+            })
+            .finally(() => setSubmitting(false));
     };
 
     return (
@@ -110,9 +119,13 @@ export default function Login() {
                     {/* Login Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        className={`w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center ${
+                            submitting ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
+                        disabled={submitting}
+                        aria-busy={submitting}
                     >
-                        Login
+                        {submitting ? "Logging in..." : "Login"}
                     </button>
                 </form>
 

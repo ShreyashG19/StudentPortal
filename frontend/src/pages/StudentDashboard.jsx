@@ -29,10 +29,9 @@ export default function StudentDashboard() {
         setLoading(true);
         let attendanceData = await getAttendance(user.student_id);
         attendanceData = attendanceData.map((item) => {
-            const [date, time] = item.date.split("T");
             return {
-                date,
-                time: time ? time.split(".")[0] : "", // Remove milliseconds if present
+                date: item.date.split("T")[0],
+                time: item.time,
                 status: item.status,
             };
         });
@@ -100,13 +99,12 @@ export default function StudentDashboard() {
                         />
                     </div>
 
-                    {/* View Attendance Button */}
                     <button
                         onClick={handleViewAttendance}
                         className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
                     >
                         <Eye className="w-5 h-5" />
-                        View Attendance
+                        View Attendance Records
                     </button>
                 </div>
             </div>
