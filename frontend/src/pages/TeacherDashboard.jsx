@@ -8,11 +8,20 @@ import {
     markAttendance,
     getLastSubmittedTime,
 } from "../services/attendanceService";
-// const students = [
-//     { id: 1, name: "Alice Smith" },
-//     { id: 2, name: "Bob Johnson" },
-//     { id: 3, name: "Charlie Brown" },
-// ];
+import {
+    User,
+    BookOpen,
+    AtSign,
+    Mail,
+    Book,
+    Eye,
+    CheckCircle,
+    X,
+    CalendarDays,
+    Clock,
+    UserCheck,
+    Users,
+} from "lucide-react"; // lucide icons
 
 function TeacherDashboard() {
     const [students, setStudents] = useState([]);
@@ -116,20 +125,21 @@ function TeacherDashboard() {
                     {/* Teacher Info */}
                     <div className="flex flex-col items-center mb-8">
                         <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                            <span className="text-3xl font-bold text-blue-700">
-                                {teacherData.name[0]}
-                            </span>
+                            <User className="w-12 h-12 text-blue-700" />
                         </div>
-                        <h2 className="text-2xl font-bold text-blue-700">
+                        <h2 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
                             {teacherData.name}
                         </h2>
-                        <span className="text-gray-500 uppercase mb-1">
+                        <span className="text-gray-500 uppercase mb-1 flex items-center gap-1">
+                            <BookOpen className="w-4 h-4" />
                             {teacherData.role}
                         </span>
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 flex items-center gap-1">
+                            <Mail className="w-4 h-4" />
                             {teacherData.email}
                         </span>
-                        <span className="text-blue-600 font-medium mt-1">
+                        <span className="text-blue-600 font-medium mt-1 flex items-center gap-1">
+                            <Book className="w-4 h-4" />
                             Subject: {teacherData.subject}
                         </span>
                     </div>
@@ -137,14 +147,16 @@ function TeacherDashboard() {
                     {/* Student Attendance List */}
                     {loading && (
                         <div className="flex justify-center items-center h-64">
-                            <span className="text-blue-600 text-xl font-semibold">
+                            <span className="text-blue-600 text-xl font-semibold flex items-center gap-2">
+                                <Users className="w-6 h-6" />
                                 Loading students...
                             </span>
                         </div>
                     )}
                     {!loading && (
                         <div>
-                            <h3 className="text-lg font-bold mb-4 text-blue-700">
+                            <h3 className="text-lg font-bold mb-4 text-blue-700 flex items-center gap-2">
+                                <UserCheck className="w-5 h-5" />
                                 Mark Attendance
                             </h3>
                             <div className="space-y-4">
@@ -157,14 +169,19 @@ function TeacherDashboard() {
                                             onClick={() =>
                                                 handleViewAttendance(student.id)
                                             }
-                                            className="font-medium hover:opacity-50 cursor-pointer"
+                                            className="font-medium hover:opacity-50 cursor-pointer flex items-center gap-1"
                                         >
+                                            <User className="w-4 h-4 text-blue-600" />
                                             {student.name}
+                                            <Eye
+                                                className="w-4 h-4 text-gray-400 ml-2"
+                                                title="View Attendance"
+                                            />
                                         </span>
                                         <div className="flex gap-2">
                                             <button
                                                 type="button"
-                                                className={`px-4 py-1 rounded-lg ${
+                                                className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
                                                     attendance[student.id] ===
                                                     "Present"
                                                         ? "bg-green-600 text-white"
@@ -177,11 +194,12 @@ function TeacherDashboard() {
                                                     )
                                                 }
                                             >
+                                                
                                                 Present
                                             </button>
                                             <button
                                                 type="button"
-                                                className={`px-4 py-1 rounded-lg ${
+                                                className={`px-4 py-1 rounded-lg flex items-center gap-1 ${
                                                     attendance[student.id] ===
                                                     "Absent"
                                                         ? "bg-red-600 text-white"
@@ -194,6 +212,7 @@ function TeacherDashboard() {
                                                     )
                                                 }
                                             >
+                                                
                                                 Absent
                                             </button>
                                         </div>
@@ -201,7 +220,8 @@ function TeacherDashboard() {
                                 ))}
                             </div>
                             {/* Last submitted date text */}
-                            <div className="flex justify-start mt-6">
+                            <div className="flex justify-start mt-6 items-center gap-2">
+                                <Clock className="w-4 h-4 text-gray-400" />
                                 <span className="text-gray-500 font-medium text-sm">
                                     Last submitted time : {lastSubmitted}
                                 </span>
@@ -209,8 +229,9 @@ function TeacherDashboard() {
                             <button
                                 onClick={handleSubmit}
                                 disabled={submitting}
-                                className="mt-8 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-60"
+                                className="mt-8 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-60 flex items-center justify-center gap-2"
                             >
+                                <CheckCircle className="w-5 h-5" />
                                 {submitting
                                     ? "Submitting..."
                                     : "Submit Attendance"}
@@ -225,14 +246,16 @@ function TeacherDashboard() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                     <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
                         <div className="mb-5 justify-between flex items-center">
-                            <h3 className="text-xl font-bold text-blue-700">
+                            <h3 className="text-xl font-bold text-blue-700 flex items-center gap-2">
+                                <CalendarDays className="w-5 h-5" />
                                 Attendance
                             </h3>
                             <button
                                 onClick={handleCloseModal}
-                                className="bg-red-600 hover:bg-red-700 px-4 py-1 text-md text-white rounded-md cursor-pointer"
+                                className="bg-red-600 hover:bg-red-700 px-4 py-1 text-md text-white rounded-md cursor-pointer flex items-center gap-1"
                                 aria-label="Close"
                             >
+                                <X className="w-4 h-4" />
                                 Close
                             </button>
                         </div>
@@ -245,12 +268,15 @@ function TeacherDashboard() {
                                 <thead>
                                     <tr>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <CalendarDays className="inline w-4 h-4 mr-1" />
                                             Date
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <Clock className="inline w-4 h-4 mr-1" />
                                             Time
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <CheckCircle className="inline w-4 h-4 mr-1" />
                                             Status
                                         </th>
                                     </tr>
@@ -275,7 +301,18 @@ function TeacherDashboard() {
                                                     {item.time}
                                                 </td>
                                                 <td className="py-2 px-4 border-b text-center">
-                                                    {item.status}
+                                                    {item.status ===
+                                                    "Present" ? (
+                                                        <span className="flex items-center justify-center gap-1 text-green-600">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                            Present
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center justify-center gap-1 text-red-600">
+                                                            <X className="w-4 h-4" />
+                                                            Absent
+                                                        </span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

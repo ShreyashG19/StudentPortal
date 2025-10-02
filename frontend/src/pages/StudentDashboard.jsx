@@ -3,6 +3,19 @@ import ProfileDescriptionItem from "../components/ProfileDescriptionItem";
 import Navbar from "../components/Navbar";
 import { getAttendance } from "../services/attendanceService";
 import { useAuth } from "../context/AuthContext";
+import {
+    User,
+    AtSign,
+    Hash,
+    BookOpen,
+    CalendarDays,
+    Clock,
+    CheckCircle,
+    X,
+    Eye,
+    GraduationCap,
+} from "lucide-react"; // lucide icons
+
 export default function StudentDashboard() {
     const { user } = useAuth();
     const data = user;
@@ -45,14 +58,13 @@ export default function StudentDashboard() {
                     {/* Header */}
                     <div className="flex flex-col items-center mb-6">
                         <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                            <span className="text-3xl font-bold text-blue-700">
-                                {data.name[0]}
-                            </span>
+                            <User className="w-12 h-12 text-blue-700" />
                         </div>
-                        <h2 className="text-2xl font-bold text-blue-700">
+                        <h2 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
                             {data.name}
                         </h2>
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 flex items-center gap-1">
+                            <GraduationCap className="w-4 h-4 mr-1" />
                             {data.role.toUpperCase()}
                         </span>
                     </div>
@@ -60,15 +72,30 @@ export default function StudentDashboard() {
                     {/* Info Section */}
                     <div className="divide-y divide-gray-200">
                         <ProfileDescriptionItem
-                            label="Roll Number"
+                            label={
+                                <span className="flex items-center gap-1">
+                                    <Hash className="w-4 h-4" />
+                                    Roll Number
+                                </span>
+                            }
                             value={data.roll_number}
                         />
                         <ProfileDescriptionItem
-                            label="Class"
+                            label={
+                                <span className="flex items-center gap-1">
+                                    <BookOpen className="w-4 h-4" />
+                                    Class
+                                </span>
+                            }
                             value={data.class}
                         />
                         <ProfileDescriptionItem
-                            label="Email"
+                            label={
+                                <span className="flex items-center gap-1">
+                                    <AtSign className="w-4 h-4" />
+                                    Email
+                                </span>
+                            }
                             value={data.email}
                         />
                     </div>
@@ -76,8 +103,9 @@ export default function StudentDashboard() {
                     {/* View Attendance Button */}
                     <button
                         onClick={handleViewAttendance}
-                        className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
                     >
+                        <Eye className="w-5 h-5" />
                         View Attendance
                     </button>
                 </div>
@@ -88,14 +116,16 @@ export default function StudentDashboard() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
                     <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
                         <div className="mb-5 justify-between flex items-center">
-                            <h3 className="text-xl font-bold text-blue-700">
+                            <h3 className="text-xl font-bold text-blue-700 flex items-center gap-2">
+                                <CalendarDays className="w-5 h-5" />
                                 Attendance
                             </h3>
                             <button
                                 onClick={handleCloseModal}
-                                className="bg-red-600 hover:bg-red-700 px-4 py-1 text-md text-white rounded"
+                                className="bg-red-600 hover:bg-red-700 px-4 py-1 text-md text-white rounded flex items-center gap-1"
                                 aria-label="Close"
                             >
+                                <X className="w-4 h-4" />
                                 Close
                             </button>
                         </div>
@@ -108,12 +138,15 @@ export default function StudentDashboard() {
                                 <thead>
                                     <tr>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <CalendarDays className="inline w-4 h-4 mr-1" />
                                             Date
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <Clock className="inline w-4 h-4 mr-1" />
                                             Time
                                         </th>
                                         <th className="py-2 px-4 border-b text-center">
+                                            <CheckCircle className="inline w-4 h-4 mr-1" />
                                             Status
                                         </th>
                                     </tr>
@@ -138,7 +171,18 @@ export default function StudentDashboard() {
                                                     {item.time}
                                                 </td>
                                                 <td className="py-2 px-4 border-b text-center">
-                                                    {item.status}
+                                                    {item.status ===
+                                                    "Present" ? (
+                                                        <span className="flex items-center justify-center gap-1 text-green-600">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                            Present
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center justify-center gap-1 text-red-600">
+                                                            <X className="w-4 h-4" />
+                                                            Absent
+                                                        </span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))
